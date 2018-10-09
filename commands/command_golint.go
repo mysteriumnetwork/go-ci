@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The "MysteriumNetwork/goci" Authors.
+ * Copyright (C) 2018 The "MysteriumNetwork/go-ci" Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,13 @@ package commands
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
+	"path"
 	"regexp"
 	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/mysteriumnetwork/goci/util"
+	"github.com/mysteriumnetwork/go-ci/util"
 )
 
 // Checks if golint exists, if not installs it
@@ -79,29 +78,31 @@ func formatAndPrintGoLintOutput(rawGolint string) {
 	}
 }
 
-// Reports linting errors in the solution
-func GoLint(excludedDirs []string) error {
+// GoLint checks for linting errors in the solution
+func GoLint(pathToCheck string, excludes ...string) error {
 	mg.Deps(GetLint)
-	path, err := util.GetGoBinaryPath("golint")
+	golintPath, err := util.GetGoBinaryPath("golint")
 	if err != nil {
 		return err
 	}
+
+	gopath := util.GetGoPath()
+	dirs, err := util.GetPackagePathsWithExcludes(pathToCheck, excludes...)
+	if err != nil {
+		fmt.Println("go list crashed")
+		return err
+	}
+
 	var files []string
-	err = filepath.Walk("../", func(path string, info os.FileInfo, err error) error {
-		if util.IsPathExcluded(excludedDirs, path) {
-			return nil
-		}
-		if info.IsDir() {
-			files = append(files, path)
-		}
-		return nil
-	})
-	if err != nil {
-		return err
+
+	for _, dir := range dirs {
+		absolutePath := path.Join(gopath, "src", dir)
+		files = append(files, absolutePath)
 	}
+
 	args := []string{"--set_exit_status", "--min_confidence=1"}
 	args = append(args, files...)
-	output, err := sh.Output(path, args...)
+	output, err := sh.Output(golintPath, args...)
 	exitStatus := sh.ExitStatus(err)
 	if exitStatus == 0 {
 		fmt.Println("No linting errors")

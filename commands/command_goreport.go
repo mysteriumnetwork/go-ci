@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The "MysteriumNetwork/goci" Authors.
+ * Copyright (C) 2018 The "MysteriumNetwork/go-ci" Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@ import (
 	"time"
 )
 
-func updateReport(pkg string) error {
+func updateReport(repo string) error {
 	uri := "https://goreportcard.com/checks"
-	payload := strings.NewReader(fmt.Sprintf("repo=%v", url.QueryEscape(pkg)))
+	payload := strings.NewReader(fmt.Sprintf("repo=%v", url.QueryEscape(repo)))
 	req, _ := http.NewRequest("POST", uri, payload)
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 	client := http.Client{
@@ -44,8 +44,8 @@ func updateReport(pkg string) error {
 }
 
 // GoReport updates the go report for the given repo
-func GoReport(pkg string) error {
-	err := updateReport(pkg)
+func GoReport(repo string) error {
+	err := updateReport(repo)
 	if err != nil {
 		fmt.Println("Report update failure")
 		return err

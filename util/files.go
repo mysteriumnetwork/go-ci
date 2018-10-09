@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The "MysteriumNetwork/goci" Authors.
+ * Copyright (C) 2018 The "MysteriumNetwork/go-ci" Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package util
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -31,6 +32,41 @@ func IsPathExcluded(paths []string, path string) bool {
 		}
 	}
 	return false
+}
+
+// GetPackagePathsWithExcludes returns the package paths gotten by go list minus the dirs excluded
+func GetPackagePathsWithExcludes(path string, excludes ...string) ([]string, error) {
+	res, err := GetPackagePaths(path)
+	if err != nil {
+		return res, err
+	}
+
+	result := make([]string, 0)
+	for _, dir := range res {
+		isExcluded := false
+		for _, v := range excludes {
+			if strings.Contains(dir, "/"+v) {
+				isExcluded = true
+			}
+		}
+		if !isExcluded {
+			result = append(result, dir)
+		}
+	}
+
+	return result, nil
+}
+
+// GetPackagePaths gets the go paths for various checks
+func GetPackagePaths(path string) ([]string, error) {
+	cmd := exec.Command("go", "list", path)
+	res, err := cmd.Output()
+	if err != nil {
+		return []string{}, err
+	}
+	stringified := string(res)
+	splits := strings.Split(stringified, "\n")
+	return splits, nil
 }
 
 // GetProjectFileDirectories returns all the project directories excluding git and vendor

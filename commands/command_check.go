@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The "MysteriumNetwork/goci" Authors.
+ * Copyright (C) 2018 The "MysteriumNetwork/go-ci" Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package util
+package commands
 
-// MagePathOverrideEnvVar is the variable we use for path related overrides
-const MagePathOverrideEnvVar = "MAGEFILE_PATH_OVERRIDE"
+import (
+	"github.com/magefile/mage/mg"
+)
+
+// Performs all the common checks
+func Check(dir string, excludes ...string) error {
+	copyrightWrapper := func() error {
+		return Copyright(dir, excludes...)
+	}
+	importsWrapper := func() error {
+		return GoImports(dir, excludes...)
+	}
+	goLintWrapper := func() error {
+		return GoLint(dir, excludes...)
+	}
+	goVetWrapper := func() error {
+		return GoVet(dir)
+	}
+	mg.Deps(copyrightWrapper, importsWrapper, goLintWrapper, goVetWrapper)
+	return nil
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The "MysteriumNetwork/goci" Authors.
+ * Copyright (C) 2018 The "MysteriumNetwork/go-ci" Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +19,15 @@ package commands
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/magefile/mage/sh"
-	"github.com/mysteriumnetwork/goci/util"
 )
 
-// Checks that the source is compliant with go vet
-func GoVet() error {
-	path := os.Getenv(util.MagePathOverrideEnvVar)
-	if path == "" {
-		path = "../..."
-	}
-	out, err := sh.Output("go", "vet", "-composites=false", path)
+// GoVet checks that the source is compliant with go vet
+func GoVet(path string, aditionalArgs ...string) error {
+	args := []string{"vet", path}
+	args = append(args, aditionalArgs...)
+	out, err := sh.Output("go", args...)
 	fmt.Print(out)
 	if err != nil {
 		return err

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The "MysteriumNetwork/goci" Authors.
+ * Copyright (C) 2018 The "MysteriumNetwork/go-ci" Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,11 +21,12 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"path"
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/mysteriumnetwork/goci/util"
+	"github.com/mysteriumnetwork/go-ci/util"
 )
 
 // Fetches the goimports binary
@@ -43,31 +44,42 @@ func GetImports() error {
 	return nil
 }
 
-// Checks for issues with go imports
-func GoImports(exludedPaths []string) error {
+// GoImports checks for issues with go imports
+func GoImports(pathToCheck string, excludes ...string) error {
 	mg.Deps(GetImports)
-	path, err := util.GetGoBinaryPath("goimports")
+
+	goimportsBinaryPath, err := util.GetGoBinaryPath("goimports")
 	if err != nil {
 		fmt.Println("Tool 'goimports' not found")
 		return err
 	}
-	args := []string{"-e", "-l"}
+	gopath := util.GetGoPath()
+	dirs, err := util.GetPackagePathsWithExcludes(pathToCheck, excludes...)
+	if err != nil {
+		fmt.Println("go list crashed")
+		return err
+	}
+
 	dirsToLook := make([]string, 0)
-	res, _ := ioutil.ReadDir("../")
-	for _, v := range res {
-		if !v.IsDir() {
+	for _, dir := range dirs {
+		absolutePath := path.Join(gopath, "src", dir)
+		res, _ := ioutil.ReadDir(absolutePath)
+		for _, v := range res {
+			if v.IsDir() {
+				continue
+			}
 			extension := filepath.Ext(v.Name())
 			if extension != ".go" {
 				continue
 			}
-		}
-		path := "../" + v.Name()
-		if !util.IsPathExcluded(exludedPaths, path) {
+			path := path.Join(absolutePath, v.Name())
 			dirsToLook = append(dirsToLook, path)
 		}
 	}
+
+	args := []string{"-e", "-l"}
 	args = append(args, dirsToLook...)
-	out, err := sh.Output(path, args...)
+	out, err := sh.Output(goimportsBinaryPath, args...)
 	if err != nil {
 		fmt.Println("Could not run goimports")
 		return err
@@ -75,7 +87,7 @@ func GoImports(exludedPaths []string) error {
 	if len(out) != 0 {
 		fmt.Println("The following files contain go import errors:")
 		fmt.Println(out)
-		return errors.New("Not all imports follow the goimports format.")
+		return errors.New("not all imports follow the goimports format")
 	}
 	fmt.Println("Goimports is happy - all files are OK!")
 	return nil

@@ -9,19 +9,19 @@ To use it, include a makefile in root of your repo directory
 # If you know what GOPATH is then you probably don't need to bother with make.
 
 MAGE_PATH=${GOPATH}/src/github.com/magefile/mage
-MAGE=go run ${GOPATH}/src/github.com/mysteriumnetwork/goci/mage.go -d ./ci
+MAGE=go run ${GOPATH}/src/github.com/mysteriumnetwork/go-ci/mage.go -d ./ci
 
 default:
 ifeq ("$(wildcard $(MAGE_PATH))","")
 	go get -u -d github.com/magefile/mage
-	go get github.com/mysteriumnetwork/goci
+	go get github.com/mysteriumnetwork/go-ci
 endif
 	${MAGE} -l
 
 % :
 ifeq ("$(wildcard $(MAGE_PATH))","")
 	go get -u -d github.com/magefile/mage
-	go get github.com/mysteriumnetwork/goci
+	go get github.com/mysteriumnetwork/go-ci
 endif
 	${MAGE} $@
 ```
@@ -31,26 +31,15 @@ Then, create a ci folder to contain all the mage files you need. To include the 
 
 
 ```
-// +build mage
-
-package main
-
-import (
-	"github.com/magefile/mage/mg"
-	"github.com/mysteriumnetwork/goci/commands"
-)
-
-// ExludedDirs contains the list of directories that we'll exclude for the repo
-var ExludedDirs = []string{".git", "vendor", "build", "docs"}
 
 // Runs the test suite against the repo
 func Test() error {
-	return commands.Test()
+	return commands.Test("../...")
 }
 
 // Checks for copyright headers in files
-func Copyright() error {
-	return commands.Copyright(ExludedDirs)
+func CheckCopyright() error {
+	return commands.Copyright("../...")
 }
 
 // Installs go dependencies
@@ -59,23 +48,28 @@ func Dep() error {
 }
 
 // Checks for issues with go imports
-func GoImports() error {
-	return commands.GoImports(ExludedDirs)
+func CheckGoImports() error {
+	return commands.GoImports("../...")
 }
 
 // Reports linting errors in the solution
-func GoLint() error {
-	return commands.GoLint(ExludedDirs)
+func CheckGoLint() error {
+	return commands.GoLint("../...")
 }
 
 // Updates the go report for the repo
-func GoReport() error {
-	return commands.GoReport("github.com/your-name/your-project")
+func CheckGoReport() error {
+	return commands.GoReport("github.com/your-name/your-repo")
 }
 
 // Checks that the source is compliant with go vet
-func GoVet() error {
-	return commands.GoVet()
+func CheckGoVet() error {
+	return commands.GoVet("../...")
+}
+
+// Checks that the source is compliant with go vet
+func Check() error {
+	return commands.Check("../...")
 }
 
 ```

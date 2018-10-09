@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The "MysteriumNetwork/goci" Authors.
+ * Copyright (C) 2018 The "MysteriumNetwork/go-ci" Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,12 @@
 package commands
 
 import (
-	"os"
-
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/mysteriumnetwork/goci/util"
 )
 
 // Runs the test suite against the repo
-func Test() error {
+func Test(path string) error {
 	mg.Deps(Deps)
-	path := os.Getenv(util.MagePathOverrideEnvVar)
-	if path == "" {
-		path = "../..."
-	}
 	return sh.RunV("go", "test", "-race", "-cover", path)
 }

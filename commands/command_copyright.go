@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The "MysteriumNetwork/goci" Authors.
+ * Copyright (C) 2018 The "MysteriumNetwork/go-ci" Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,44 +21,54 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 
-	"github.com/mysteriumnetwork/goci/util"
+	"github.com/mysteriumnetwork/go-ci/util"
 )
 
 var copyrightRegex = regexp.MustCompile(`Copyright \(C\) \d{4} The "MysteriumNetwork/`)
 
-func getFilesWithoutCopyright(exludedDirs []string) ([]string, error) {
+func getFilesWithoutCopyright(dirsToCheck []string) ([]string, error) {
 	badFiles := make([]string, 0)
-	err := filepath.Walk("../", func(path string, info os.FileInfo, err error) error {
+	gopath := util.GetGoPath()
+
+	for i := range dirsToCheck {
+		absolutePath := path.Join(gopath, "src", dirsToCheck[i])
+		files, err := ioutil.ReadDir(absolutePath)
 		if err != nil {
-			return err
+			return badFiles, err
 		}
-		if info.IsDir() || util.IsPathExcluded(exludedDirs, path) {
-			return nil
+		for j := range files {
+			if files[j].IsDir() {
+				continue
+			}
+			extension := filepath.Ext(files[j].Name())
+			if extension != ".go" {
+				continue
+			}
+			contents, err := ioutil.ReadFile(path.Join(absolutePath, files[j].Name()))
+			if err != nil {
+				return nil, err
+			}
+			match := copyrightRegex.Match(contents)
+			if !match {
+				badFiles = append(badFiles, path.Join(dirsToCheck[i], files[j].Name()))
+			}
 		}
-		extension := filepath.Ext(path)
-		if extension != ".go" {
-			return nil
-		}
-		contents, err := ioutil.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		match := copyrightRegex.Match(contents)
-		if !match {
-			badFiles = append(badFiles, path)
-		}
-		return nil
-	})
-	return badFiles, err
+	}
+	return badFiles, nil
 }
 
 // Copyright checks for copyright headers in files
-func Copyright(exludedDirs []string) error {
-	badFiles, err := getFilesWithoutCopyright(exludedDirs)
+func Copyright(path string, excludes ...string) error {
+	res, err := util.GetPackagePathsWithExcludes(path, excludes...)
+	if err != nil {
+		fmt.Println("go list crashed")
+		return err
+	}
+	badFiles, err := getFilesWithoutCopyright(res)
 	if err != nil {
 		return err
 	}

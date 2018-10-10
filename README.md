@@ -4,7 +4,7 @@ This is a repo containing common magefile based CI tools for golang projects.
 
 To use it, include a makefile in root of your repo directory
 
-```
+```makefile
 # This Makefile is meant to be used by people that do not usually work with Go source code.
 # If you know what GOPATH is then you probably don't need to bother with make.
 
@@ -27,11 +27,10 @@ endif
 ```
 
 
-Then, create a ci folder to contain all the mage files you need. To include the common scripts from this library, a following file is suggested:
+Then, create a `ci/` folder to contain all the mage files you need. To include the common scripts from this library, a following file is suggested:
 
 
-```
-
+```golang
 // Runs the test suite against the repo
 func Test() error {
 	return commands.Test("../...")

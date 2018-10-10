@@ -54,7 +54,7 @@ func getPackageFromGoLintOutput(line string) string {
 }
 
 func formatAndPrintGoLintOutput(rawGolint string) {
-	packageErrorMap := make(map[string][]string, 0)
+	packageErrorMap := make(map[string][]string)
 	separateLines := strings.Split(rawGolint, "\n")
 
 	for i := range separateLines {

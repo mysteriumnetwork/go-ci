@@ -24,9 +24,9 @@ import (
 )
 
 // GoVet checks that the source is compliant with go vet
-func GoVet(path string, aditionalArgs ...string) error {
+func GoVet(path string, additionalArgs ...string) error {
 	args := []string{"vet", path}
-	args = append(args, aditionalArgs...)
+	args = append(args, additionalArgs...)
 	out, err := sh.Output("go", args...)
 	fmt.Print(out)
 	if err != nil {

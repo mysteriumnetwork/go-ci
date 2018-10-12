@@ -8,52 +8,48 @@ To use it, include a makefile in root of your repo directory
 # This Makefile is meant to be used by people that do not usually work with Go source code.
 # If you know what GOPATH is then you probably don't need to bother with make.
 
-MAGE_PATH=${GOPATH}/src/github.com/magefile/mage
-MAGE=go run ${GOPATH}/src/github.com/mysteriumnetwork/go-ci/mage.go -d ./ci
+GO_PATH=$(shell go env GOPATH)
+DEP_PATH=$(GO_PATH)/bin/dep
+MAGE=go run ci/mage.go
 
 default:
-ifeq ("$(wildcard $(MAGE_PATH))","")
-	go get -u -d github.com/magefile/mage
-	go get github.com/mysteriumnetwork/go-ci
+ifeq ("$(wildcard $(DEP_PATH))", "")
+	go get -u github.com/golang/dep/cmd/dep
 endif
+	${DEP_PATH} ensure
 	${MAGE} -l
 
 % :
-ifeq ("$(wildcard $(MAGE_PATH))","")
-	go get -u -d github.com/magefile/mage
-	go get github.com/mysteriumnetwork/go-ci
+ifeq ("$(wildcard $(DEP_PATH))", "")
+	go get -u github.com/golang/dep/cmd/dep
 endif
-	${MAGE} $@
+	${DEP_PATH} ensure
+	${MAGE} $(MAKECMDGOALS)
+
 ```
 
 
-Then, create a `ci/` folder to contain all the mage files you need. To include the common scripts from this library, a following file is suggested:
-
+Then, create a `magefile.go` file to contain all the mage files you need. To include the common scripts from this library, a following file is suggested:
 
 ```golang
 // Runs the test suite against the repo
 func Test() error {
-	return commands.Test("../...")
+	return commands.Test("./...")
 }
 
 // Checks for copyright headers in files
 func CheckCopyright() error {
-	return commands.Copyright("../...")
-}
-
-// Installs go dependencies
-func Dep() error {
-	return commands.Deps()
+	return commands.Copyright("./...")
 }
 
 // Checks for issues with go imports
 func CheckGoImports() error {
-	return commands.GoImports("../...")
+	return commands.GoImports("./...")
 }
 
 // Reports linting errors in the solution
 func CheckGoLint() error {
-	return commands.GoLint("../...")
+	return commands.GoLint("./...")
 }
 
 // Updates the go report for the repo
@@ -63,12 +59,12 @@ func CheckGoReport() error {
 
 // Checks that the source is compliant with go vet
 func CheckGoVet() error {
-	return commands.GoVet("../...")
+	return commands.GoVet("./...")
 }
 
 // Checks that the source is compliant with go vet
 func Check() error {
-	return commands.Check("../...")
+	return commands.Check("./...")
 }
 
 ```

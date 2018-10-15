@@ -18,12 +18,10 @@
 package commands
 
 import (
-	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
 
 // Runs the test suite against the repo
 func Test(path string) error {
-	mg.Deps(Deps)
 	return sh.RunV("go", "test", "-race", "-cover", path)
 }

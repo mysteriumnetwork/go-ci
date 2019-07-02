@@ -2,19 +2,26 @@
 
 
 [[projects]]
+  digest = "1:f4e64bb62274202b95403b8ae001d0601cee01afadf60767fb0e1d239f8f1413"
   name = "github.com/magefile/mage"
   packages = [
+    "internal",
     "mage",
     "mg",
     "parse",
-    "sh"
+    "sh",
   ]
-  revision = "a8460f7aa9523266febfca9df7a45025b7460152"
-  version = "v1.6.2"
+  pruneopts = "UT"
+  revision = "aedfce64c122eef47009b7f80c9771044753215d"
+  version = "v1.8.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "33e269c52ce671eb556b198b0539e60846a90c99f870d87e15f835a3032196d2"
+  input-imports = [
+    "github.com/magefile/mage/mage",
+    "github.com/magefile/mage/mg",
+    "github.com/magefile/mage/sh",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

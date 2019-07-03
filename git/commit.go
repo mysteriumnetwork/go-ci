@@ -19,6 +19,7 @@ package git
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	gogit "gopkg.in/src-d/go-git.v4"
@@ -47,14 +48,14 @@ func (gc *GitCommiter) Checkout(branchName string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("repo opened")
+	log.Println("repo opened")
 	w, err := gc.repo.Worktree()
 	if err != nil {
 		return err
 	}
-	fmt.Println("worktree fetched")
+	log.Println("worktree fetched")
 
-	fmt.Println("checking out master")
+	log.Println("checking out master")
 	err = w.Checkout(&gogit.CheckoutOptions{
 		Create: false,
 		Force:  true,
@@ -64,23 +65,23 @@ func (gc *GitCommiter) Checkout(branchName string) error {
 	}
 	gc.w = w
 	gc.branch = branchName
-	fmt.Println("master checked out")
+	log.Println("master checked out")
 	return nil
 }
 
 func (gc *GitCommiter) Commit(message string, files ...string) (plumbing.Hash, error) {
-	fmt.Println("adding changes")
+	log.Println("adding changes")
 	for _, file := range files {
-		fmt.Printf("adding %q\n", file)
+		log.Printf("adding %q\n", file)
 		_, err := gc.w.Add(file)
 		if err != nil {
 			return [20]byte{}, err
 		}
-		fmt.Printf("%q added!\n", file)
+		log.Printf("%q added!\n", file)
 	}
-	fmt.Println("changes added")
+	log.Println("changes added")
 
-	fmt.Println("performing commit")
+	log.Println("performing commit")
 	commitHash, err := gc.w.Commit(message, &gogit.CommitOptions{
 		Author: &object.Signature{
 			Name:  "Mister CI tool",
@@ -91,24 +92,24 @@ func (gc *GitCommiter) Commit(message string, files ...string) (plumbing.Hash, e
 	if err != nil {
 		return commitHash, err
 	}
-	fmt.Println("Commit done")
+	log.Println("Commit done")
 	return commitHash, nil
 }
 
 func (gc *GitCommiter) Tag(tagVersion string, hash plumbing.Hash) error {
-	fmt.Println("Tagging...", tagVersion)
+	log.Println("Tagging...", tagVersion)
 	n := plumbing.ReferenceName("refs/tags/" + tagVersion)
 	t := plumbing.NewHashReference(n, hash)
 	err := gc.repo.Storer.SetReference(t)
 	if err != nil {
 		return err
 	}
-	fmt.Println("tagged")
+	log.Println("tagged")
 	return nil
 }
 
 func (gc *GitCommiter) Push() error {
-	fmt.Println("Pushing...")
+	log.Println("Pushing...")
 	rs := config.RefSpec("refs/tags/*:refs/tags/*")
 	rsm := config.RefSpec(fmt.Sprintf("refs/heads/%v:refs/heads/%v", gc.branch, gc.branch))
 	err := gc.repo.Push(&gogit.PushOptions{
@@ -123,6 +124,6 @@ func (gc *GitCommiter) Push() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Push done")
+	log.Println("Push done")
 	return nil
 }

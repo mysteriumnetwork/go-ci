@@ -25,7 +25,6 @@ import (
 
 	"github.com/mysteriumnetwork/go-ci/github"
 	"github.com/pkg/errors"
-
 	"gopkg.in/src-d/go-git.v4"
 )
 

@@ -35,7 +35,7 @@ type Releaser struct {
 
 // Release represents a Github release
 type Release struct {
-	Id      int64
+	ID      int64
 	TagName string
 	*Releaser
 }
@@ -60,7 +60,7 @@ func (r *Releaser) Create(name string) (*Release, error) {
 		return nil, err
 	}
 	log.Printf("created release ID: %v, tag: %v", *release.ID, *release.TagName)
-	return &Release{Id: *release.ID, TagName: *release.TagName, Releaser: r}, nil
+	return &Release{ID: *release.ID, TagName: *release.TagName, Releaser: r}, nil
 }
 
 // Latest finds the latest Github release
@@ -69,7 +69,7 @@ func (r *Releaser) Latest() (*Release, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Release{Id: *release.ID, TagName: *release.TagName, Releaser: r}, nil
+	return &Release{ID: *release.ID, TagName: *release.TagName, Releaser: r}, nil
 }
 
 // UploadAsset uploads asset to the release
@@ -79,12 +79,12 @@ func (r *Release) UploadAsset(path string) error {
 		return err
 	}
 	defer file.Close()
-	asset, _, err := r.client.Repositories.UploadReleaseAsset(context.Background(), r.owner, r.repository, r.Id, &gogithub.UploadOptions{
+	asset, _, err := r.client.Repositories.UploadReleaseAsset(context.Background(), r.owner, r.repository, r.ID, &gogithub.UploadOptions{
 		Name: filepath.Base(file.Name()),
 	}, file)
 	if err != nil {
 		return err
 	}
-	log.Printf("uploaded asset ", *asset.Name)
+	log.Println("uploaded asset ", *asset.Name)
 	return nil
 }

@@ -108,12 +108,16 @@ func (gc *GitCommiter) Tag(tagVersion string, hash plumbing.Hash) error {
 	return nil
 }
 
-func (gc *GitCommiter) Push() error {
+type PushOptions struct {
+	Remote string
+}
+
+func (gc *GitCommiter) Push(options *PushOptions) error {
 	log.Println("Pushing...")
 	rs := config.RefSpec("refs/tags/*:refs/tags/*")
 	rsm := config.RefSpec(fmt.Sprintf("refs/heads/%v:refs/heads/%v", gc.branch, gc.branch))
 	err := gc.repo.Push(&gogit.PushOptions{
-		RemoteName: "origin",
+		RemoteName: options.Remote,
 		Auth: &http.BasicAuth{
 			// this can be anything but not an empty string
 			Username: "MisterFancyPants",

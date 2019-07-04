@@ -31,7 +31,7 @@ import (
 
 const ppaDevReleaseVersion = "0.0.0"
 
-type envVar struct {
+type EnvVar struct {
 	key BuildVar
 	val string
 }
@@ -48,7 +48,7 @@ func GenerateEnvFile() error {
 	if err != nil {
 		return err
 	}
-	vars := []envVar{
+	vars := []EnvVar{
 		{TagBuild, strconv.FormatBool(isTag())},
 		{SnapshotBuild, strconv.FormatBool(isSnapshot())},
 		{PRBuild, strconv.FormatBool(isPR())},
@@ -121,7 +121,7 @@ func snapshotVersion() (string, error) {
 }
 
 // WriteEnvVars writes vars to a shell script so they can be sourced `source env.sh` in latter build stages
-func WriteEnvVars(vars []envVar, filename string) error {
+func WriteEnvVars(vars []EnvVar, filename string) error {
 	err := os.MkdirAll(filepath.Dir(filename), 0755)
 	if err != nil {
 		return err

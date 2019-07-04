@@ -20,6 +20,7 @@ package env
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -58,7 +59,7 @@ func GenerateEnvFile() error {
 		{GithubRepository, Str(GithubRepository)},
 		{GithubSnapshotRepository, Str(GithubSnapshotRepository)},
 	}
-	return writeEnvVars(vars)
+	return WriteEnvVars(vars, "./build/env.sh")
 }
 
 func isTag() bool {
@@ -119,9 +120,14 @@ func snapshotVersion() (string, error) {
 		gitHead.Hash().String()[:8]), nil
 }
 
-func writeEnvVars(vars []envVar) error {
-	_ = os.Mkdir("./build", 0755)
-	file, err := os.Create("./build/env.sh")
+// WriteEnvVars writes vars to a shell script so they can be sourced `source env.sh` in latter build stages
+func WriteEnvVars(vars []envVar, filename string) error {
+	err := os.MkdirAll(filepath.Dir(filename), 0755)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}

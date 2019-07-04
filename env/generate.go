@@ -32,8 +32,8 @@ import (
 const ppaDevReleaseVersion = "0.0.0"
 
 type EnvVar struct {
-	key BuildVar
-	val string
+	Key BuildVar
+	Val string
 }
 
 var buildTime = time.Now().UTC()
@@ -133,7 +133,7 @@ func WriteEnvVars(vars []EnvVar, filename string) error {
 	}
 	defer file.Close()
 	for _, v := range vars {
-		_, err := fmt.Fprintf(file, "export %s=%s;\n", v.key, v.val)
+		_, err := fmt.Fprintf(file, "export %s=%s;\n", v.Key, v.Val)
 		if err != nil {
 			return err
 		}

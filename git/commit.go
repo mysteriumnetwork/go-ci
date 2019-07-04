@@ -42,7 +42,13 @@ func NewCommiter(apiToken string) *GitCommiter {
 	}
 }
 
-func (gc *GitCommiter) Checkout(branchName string) error {
+type CheckoutOptions struct {
+	BranchName string
+	Force      bool
+	Keep       bool
+}
+
+func (gc *GitCommiter) Checkout(options *CheckoutOptions) error {
 	var err error
 	gc.repo, err = gogit.PlainOpen("./")
 	if err != nil {
@@ -58,13 +64,14 @@ func (gc *GitCommiter) Checkout(branchName string) error {
 	log.Println("checking out master")
 	err = w.Checkout(&gogit.CheckoutOptions{
 		Create: false,
-		Force:  true,
+		Force:  options.Force,
+		Keep:   options.Keep,
 	})
 	if err != nil {
 		return err
 	}
 	gc.w = w
-	gc.branch = branchName
+	gc.branch = options.BranchName
 	log.Println("master checked out")
 	return nil
 }

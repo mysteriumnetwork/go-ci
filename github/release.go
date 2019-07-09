@@ -63,6 +63,15 @@ func (r *Releaser) Create(name string) (*Release, error) {
 	return &Release{ID: *release.ID, TagName: *release.TagName, Releaser: r}, nil
 }
 
+func (r *Releaser) Find(tagName string) (*Release, error) {
+	release, _, err := r.client.Repositories.GetReleaseByTag(context.Background(), r.owner, r.repository, tagName)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("found release ID: %v, tag: %v", *release.ID, *release.TagName)
+	return &Release{ID: *release.ID, TagName: *release.TagName, Releaser: r}, nil
+}
+
 // Latest finds the latest Github release
 func (r *Releaser) Latest() (*Release, error) {
 	release, _, err := r.client.Repositories.GetLatestRelease(context.Background(), r.owner, r.repository)

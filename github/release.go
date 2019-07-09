@@ -63,6 +63,7 @@ func (r *Releaser) Create(name string) (*Release, error) {
 	return &Release{ID: *release.ID, TagName: *release.TagName, Releaser: r}, nil
 }
 
+// Find finds Github release by tag name
 func (r *Releaser) Find(tagName string) (*Release, error) {
 	release, _, err := r.client.Repositories.GetReleaseByTag(context.Background(), r.owner, r.repository, tagName)
 	if err != nil {

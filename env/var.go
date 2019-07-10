@@ -25,6 +25,9 @@ const (
 	// TagBuild indicates release build
 	TagBuild = BuildVar("RELEASE_BUILD")
 
+	// RCBuild indicates a release candidate build (containing "-rc")
+	RCBuild = BuildVar("RC_BUILD")
+
 	// SnapshotBuild indicates snapshot release build (master branch)
 	SnapshotBuild = BuildVar("SNAPSHOT_BUILD")
 

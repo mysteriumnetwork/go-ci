@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mysteriumnetwork/go-ci/github"
@@ -50,6 +51,7 @@ func GenerateEnvFile() error {
 	}
 	vars := []EnvVar{
 		{TagBuild, strconv.FormatBool(isTag())},
+		{RCBuild, strconv.FormatBool(isRC())},
 		{SnapshotBuild, strconv.FormatBool(isSnapshot())},
 		{PRBuild, strconv.FormatBool(isPR())},
 		{BuildVersion, version},
@@ -64,6 +66,10 @@ func GenerateEnvFile() error {
 
 func isTag() bool {
 	return Str(BuildTag) != ""
+}
+
+func isRC() bool {
+	return strings.Contains(Str(BuildTag), "-rc")
 }
 
 func isSnapshot() bool {

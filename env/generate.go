@@ -30,8 +30,6 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 )
 
-const ppaDevReleaseVersion = "0.0.0"
-
 type EnvVar struct {
 	Key BuildVar
 	Val string
@@ -45,17 +43,12 @@ func GenerateEnvFile() error {
 	if err != nil {
 		return err
 	}
-	ppaVersion, err := ppaVersion()
-	if err != nil {
-		return err
-	}
 	vars := []EnvVar{
 		{TagBuild, strconv.FormatBool(isTag())},
 		{RCBuild, strconv.FormatBool(isRC())},
 		{SnapshotBuild, strconv.FormatBool(isSnapshot())},
 		{PRBuild, strconv.FormatBool(isPR())},
 		{BuildVersion, version},
-		{PPAVersion, ppaVersion},
 		{BuildNumber, Str(BuildNumber)},
 		{GithubOwner, Str(GithubOwner)},
 		{GithubRepository, Str(GithubRepository)},
@@ -80,25 +73,40 @@ func isPR() bool {
 	return !isSnapshot() && !isTag()
 }
 
-func ppaVersion() (string, error) {
-	if isTag() {
-		return Str(BuildTag), EnsureEnvVars(BuildTag)
-	}
-	return ppaDevReleaseVersion, nil
-}
-
 func buildVersion() (string, error) {
 	if isTag() {
 		return Str(BuildTag), EnsureEnvVars(BuildTag)
 	}
 	if isPR() {
-		// TODO find a format for branch version, perhaps similar to snapshot?
-		return fmt.Sprintf("0.0.0-branch%s", Str(BuildBranchSafe)), nil
+		previousReleaseTagName, err := latestReleaseTagName()
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf("%s-branch-%.10s", previousReleaseTagName, Str(BuildBranchSafe)), nil
 	}
 	return snapshotVersion()
 }
 
 func snapshotVersion() (string, error) {
+	previousReleaseTagName, err := latestReleaseTagName()
+	if err != nil {
+		return "", err
+	}
+	gitLocalRepo, err := git.PlainOpen("./")
+	if err != nil {
+		return "", err
+	}
+	gitHead, err := gitLocalRepo.Head()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s-1snapshot-%s-%s",
+		previousReleaseTagName,
+		buildTime.Format("20060102T1504"),
+		gitHead.Hash().String()[:8]), nil
+}
+
+func latestReleaseTagName() (string, error) {
 	if err := EnsureEnvVars(GithubOwner, GithubRepository, GithubAPIToken); err != nil {
 		return "", err
 	}
@@ -112,18 +120,7 @@ func snapshotVersion() (string, error) {
 	} else if latestRelease == nil {
 		return "", errors.Errorf("could not find latest release in githubRepo %s/%s", Str(GithubOwner), Str(GithubRepository))
 	}
-	gitLocalRepo, err := git.PlainOpen("./")
-	if err != nil {
-		return "", err
-	}
-	gitHead, err := gitLocalRepo.Head()
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%s-1snapshot-%s-%s",
-		latestRelease.TagName,
-		buildTime.Format("20060102T1504"),
-		gitHead.Hash().String()[:8]), nil
+	return latestRelease.TagName, nil
 }
 
 // WriteEnvVars writes vars to a shell script so they can be sourced `source env.sh` in latter build stages

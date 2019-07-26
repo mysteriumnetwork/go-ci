@@ -82,7 +82,7 @@ func buildVersion() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return fmt.Sprintf("%s-1branch-%.10s", previousReleaseTagName, Str(BuildBranchSafe)), nil
+		return fmt.Sprintf("%s-1branch-%.10s-1", previousReleaseTagName, Str(BuildBranchSafe)), nil
 	}
 	return snapshotVersion()
 }

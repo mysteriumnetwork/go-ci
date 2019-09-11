@@ -21,7 +21,7 @@ import (
 	"github.com/magefile/mage/mg"
 )
 
-// Performs all the common checks
+// Check performs all the common checks
 func Check(dir string, excludes ...string) error {
 	copyrightWrapper := func() error {
 		return Copyright(dir, excludes...)
@@ -31,6 +31,25 @@ func Check(dir string, excludes ...string) error {
 	}
 	goLintWrapper := func() error {
 		return GoLint(dir, excludes...)
+	}
+	goVetWrapper := func() error {
+		return GoVet(dir)
+	}
+	mg.Deps(copyrightWrapper, importsWrapper, goLintWrapper, goVetWrapper)
+	return nil
+}
+
+// CheckD performs all the common checks on directories
+// Instead of packages, it operates on directories, thus it is compatible with gomodules outside GOPATH.
+func CheckD(dir string, excludes ...string) error {
+	copyrightWrapper := func() error {
+		return CopyrightD(dir, excludes...)
+	}
+	importsWrapper := func() error {
+		return GoImportsD(dir, excludes...)
+	}
+	goLintWrapper := func() error {
+		return GoLintD(dir, excludes...)
 	}
 	goVetWrapper := func() error {
 		return GoVet(dir)

@@ -13,6 +13,7 @@ require (
 	golang.org/x/net v0.0.0-20190628185345-da137c7871d7 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/sys v0.0.0-20190626221950-04f50cda93cb // indirect
+	golang.org/x/tools v0.0.0-20190911022129-16c5e0f7d110
 	google.golang.org/appengine v1.6.1 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.1 // indirect
 	gopkg.in/src-d/go-git.v4 v4.11.0

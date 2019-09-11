@@ -23,9 +23,11 @@ import (
 	"io/ioutil"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/mysteriumnetwork/go-ci/shell"
 	"github.com/mysteriumnetwork/go-ci/util"
 )
 
@@ -90,5 +92,39 @@ func GoImports(pathToCheck string, excludes ...string) error {
 		return errors.New("not all imports follow the goimports format")
 	}
 	fmt.Println("Goimports is happy - all files are OK!")
+	return nil
+}
+
+// GoImportsD checks for issues with go imports.
+//
+// Instead of packages, it operates on directories, thus it is compatible with gomodules outside GOPATH.
+//
+// Example:
+//     commands.GoImportsD(".", "docs")
+func GoImportsD(dir string, excludes ...string) error {
+	mg.Deps(GetImports)
+	goimportsBin, err := util.GetGoBinaryPath("goimports")
+	if err != nil {
+		fmt.Println("Tool 'goimports' not found")
+		return err
+	}
+	var allExcludes []string
+	allExcludes = append(allExcludes, excludes...)
+	allExcludes = append(allExcludes, util.GoLintExcludes()...)
+	dirs, err := util.GetProjectFileDirectories(allExcludes)
+	if err != nil {
+		return err
+	}
+	out, err := shell.NewCmd(goimportsBin + " -e -l " + strings.Join(dirs, " ")).Output()
+	if err != nil {
+		fmt.Println("goimports: error executing")
+		return err
+	}
+	if len(out) != 0 {
+		fmt.Println("goimports: the following files contain go import errors:")
+		fmt.Println(out)
+		return errors.New("goimports: not all imports follow the goimports format")
+	}
+	fmt.Println("goimports: all files are OK!")
 	return nil
 }

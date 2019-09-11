@@ -25,6 +25,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/mysteriumnetwork/go-ci/shell"
 	"github.com/mysteriumnetwork/go-ci/util"
 )
 
@@ -112,4 +113,38 @@ func GoLint(pathToCheck string, excludes ...string) error {
 	formatAndPrintGoLintOutput(output)
 	fmt.Println("Linting failed!")
 	return err
+}
+
+// GoLintD checks for linting errors in the solution
+//
+// Instead of packages, it operates on directories, thus it is compatible with gomodules outside GOPATH.
+//
+// Example:
+//     commands.GoLintD(".", "docs")
+func GoLintD(dir string, excludes ...string) error {
+	mg.Deps(GetLint)
+	golintBin, err := util.GetGoBinaryPath("golint")
+	if err != nil {
+		return err
+	}
+
+	var allExcludes []string
+	allExcludes = append(allExcludes, excludes...)
+	allExcludes = append(allExcludes, util.GoLintExcludes()...)
+	dirs, err := util.GetProjectFileDirectories(allExcludes)
+	if err != nil {
+		fmt.Println("golint: go list crashed")
+		return err
+	}
+
+	output, err := shell.NewCmd(golintBin + " --set_exit_status --min_confidence=1 " + strings.Join(dirs, " ")).Output()
+	exitStatus := sh.ExitStatus(err)
+	if exitStatus != 0 {
+		formatAndPrintGoLintOutput(output)
+		fmt.Println("golint: linting failed!")
+		return err
+	}
+
+	fmt.Println("golint: no linting errors")
+	return nil
 }

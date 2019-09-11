@@ -23,7 +23,7 @@ import (
 	"os"
 	"path/filepath"
 
-	gogithub "github.com/google/go-github/github"
+	gogithub "github.com/google/go-github/v28/github"
 	"golang.org/x/oauth2"
 )
 

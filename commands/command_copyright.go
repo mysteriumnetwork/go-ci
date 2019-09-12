@@ -82,3 +82,63 @@ func Copyright(path string, excludes ...string) error {
 	fmt.Println("All files have required copyright headers!")
 	return nil
 }
+
+// CopyrightD checks for copyright headers in files
+//
+// Instead of packages, it operates on directories, thus it is compatible with gomodules outside GOPATH.
+//
+// Example:
+//     commands.CopyrightD(".", "docs")
+func CopyrightD(path string, excludes ...string) error {
+	var allExcludes []string
+	allExcludes = append(allExcludes, excludes...)
+	allExcludes = append(allExcludes, util.GoLintExcludes()...)
+	res, err := util.GetProjectFileDirectories(allExcludes)
+	if err != nil {
+		fmt.Println("copyright: go list crashed")
+		return err
+	}
+	badFiles, err := getFilesWithoutCopyrightD(res)
+	if err != nil {
+		fmt.Println("copyright: error listing files")
+		return err
+	}
+	if len(badFiles) != 0 {
+		fmt.Println("copyright: following files are missing copyright headers:")
+		for _, v := range badFiles {
+			fmt.Println(v)
+		}
+		return errors.New("copyright: missing copyright headers")
+	}
+	fmt.Println("copyright: all files have required copyright headers!")
+	return nil
+}
+
+func getFilesWithoutCopyrightD(dirsToCheck []string) ([]string, error) {
+	badFiles := make([]string, 0)
+
+	for i := range dirsToCheck {
+		files, err := ioutil.ReadDir(dirsToCheck[i])
+		if err != nil {
+			return badFiles, err
+		}
+		for j := range files {
+			if files[j].IsDir() {
+				continue
+			}
+			extension := filepath.Ext(files[j].Name())
+			if extension != ".go" {
+				continue
+			}
+			contents, err := ioutil.ReadFile(path.Join(dirsToCheck[i], files[j].Name()))
+			if err != nil {
+				return nil, err
+			}
+			match := copyrightRegex.Match(contents)
+			if !match {
+				badFiles = append(badFiles, path.Join(dirsToCheck[i], files[j].Name()))
+			}
+		}
+	}
+	return badFiles, nil
+}

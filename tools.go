@@ -1,5 +1,7 @@
+// +build tools
+
 /*
- * Copyright (C) 2018 The "MysteriumNetwork/go-ci" Authors.
+ * Copyright (C) 2019 The "MysteriumNetwork/feedback" Authors.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package commands
+package main
+
+// Empty file for keeping CI tools in go.mod
 
 import (
-	"fmt"
-
-	"github.com/magefile/mage/sh"
+	_ "golang.org/x/tools/cmd/goimports"
 )
-
-// GoVet checks that the source is compliant with go vet
-func GoVet(path string, additionalArgs ...string) error {
-	args := []string{"vet", path}
-	args = append(args, additionalArgs...)
-	out, err := sh.Output("go", args...)
-	fmt.Print(out)
-	if err != nil {
-		return err
-	}
-	fmt.Println("govet: all files are compliant")
-	return nil
-}

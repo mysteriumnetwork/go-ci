@@ -69,6 +69,16 @@ func GetPackagePaths(path string) ([]string, error) {
 	return splits, nil
 }
 
+// GoLintExcludes returns commonly excluded dirs from quality checks
+func GoLintExcludes() []string {
+	return []string{
+		".idea",
+		".git",
+		"build",
+		"vendor",
+	}
+}
+
 // GetProjectFileDirectories returns all the project directories excluding git and vendor
 func GetProjectFileDirectories(paths []string) ([]string, error) {
 	directories := make([]string, 0)

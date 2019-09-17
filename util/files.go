@@ -27,7 +27,7 @@ import (
 // IsPathExcluded determines if the provided path is excluded from common searches
 func IsPathExcluded(paths []string, path string) bool {
 	for _, exclude := range paths {
-		if strings.Contains(path, "/"+exclude) {
+		if strings.HasPrefix(path, exclude) {
 			return true
 		}
 	}
@@ -83,7 +83,7 @@ func GoLintExcludes() []string {
 func GetProjectFileDirectories(paths []string) ([]string, error) {
 	directories := make([]string, 0)
 
-	err := filepath.Walk("../", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk("./", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() && !IsPathExcluded(paths, path) {
 			directories = append(directories, path)
 		}

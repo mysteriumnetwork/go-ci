@@ -83,8 +83,9 @@ func GoLintExcludes() []string {
 func GetProjectFileDirectories(paths []string) ([]string, error) {
 	directories := make([]string, 0)
 
-	err := filepath.Walk("./", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() && !IsPathExcluded(paths, path) {
+	root := "./"
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() && !IsPathExcluded(paths, path) && path != root {
 			directories = append(directories, path)
 		}
 		return nil

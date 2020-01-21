@@ -20,7 +20,10 @@ package env
 import (
 	"log"
 	"os"
+	"regexp"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 // Bool reads a bool env var.
@@ -39,7 +42,7 @@ func Str(v BuildVar) string {
 
 // IfRelease performs func passed as an arg if current build is any kind of release
 func IfRelease(do func() error) error {
-	isRelease, err := isRelease()
+	isRelease, err := IsRelease()
 	if err != nil {
 		return err
 	}
@@ -51,9 +54,27 @@ func IfRelease(do func() error) error {
 	return nil
 }
 
-func isRelease() (bool, error) {
+// IsRelease true when building a release (tag or snapshot).
+func IsRelease() (bool, error) {
 	if err := EnsureEnvVars(TagBuild, SnapshotBuild); err != nil {
 		return false, err
 	}
 	return Bool(TagBuild) || Bool(SnapshotBuild), nil
+}
+
+// IsPR true when building a Pull Request.
+func IsPR() (bool, error) {
+	if err := EnsureEnvVars(PRBuild); err != nil {
+		return false, err
+	}
+	return Bool(PRBuild), nil
+}
+
+// IsFullBuild true when full build is requested via commit message `[ci full]`
+func IsFullBuild() (bool, error) {
+	if err := EnsureEnvVars(CommitMessage); err != nil {
+		return false, err
+	}
+	match, err := regexp.MatchString(`\[ci full]`, Str(CommitMessage))
+	return match, errors.Wrap(err, "failed to parse commit message")
 }

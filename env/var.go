@@ -69,4 +69,7 @@ const (
 
 	// DockerHubPassword is hub.docker.com password of DockerHubUsername
 	DockerHubPassword = BuildVar("DOCKERHUB_PASSWORD")
+
+	// CommitMessage is HEAD commit message
+	CommitMessage = BuildVar("CI_COMMIT_MESSAGE")
 )

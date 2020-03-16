@@ -115,7 +115,7 @@ func GoImportsD(dir string, excludes ...string) error {
 	if err != nil {
 		return err
 	}
-	out, err := shell.NewCmd(goimportsBin + " -e -l " + strings.Join(dirs, " ")).Output()
+	out, err := shell.NewCmd(goimportsBin + " -e -l -d " + strings.Join(dirs, " ")).Output()
 	if err != nil {
 		fmt.Println("goimports: error executing")
 		return err

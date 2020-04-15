@@ -28,7 +28,7 @@ import (
 	"github.com/mysteriumnetwork/go-ci/util"
 )
 
-var copyrightRegex = regexp.MustCompile(`Copyright \(C\) \d{4} The "MysteriumNetwork/`)
+var copyrightRegex = regexp.MustCompile(`Copyright \(C\) \d{4}`)
 
 func getFilesWithoutCopyright(dirsToCheck []string) ([]string, error) {
 	badFiles := make([]string, 0)

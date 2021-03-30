@@ -10,5 +10,5 @@ import "github.com/mysteriumnetwork/go-ci/commands"
 
 // Check runs all of the checks.
 func Check() error {
-	return commands.CheckD(".")
+	return commands.CheckD("./...")
 }

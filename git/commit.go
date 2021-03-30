@@ -9,16 +9,16 @@ import (
 	"log"
 	"time"
 
-	gogit "gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/config"
-	"gopkg.in/src-d/go-git.v4/plumbing"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
-	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
+	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
 type GitCommiter struct {
-	repo   *gogit.Repository
-	w      *gogit.Worktree
+	repo   *git.Repository
+	w      *git.Worktree
 	branch string
 	token  string
 }
@@ -37,7 +37,7 @@ type CheckoutOptions struct {
 
 func (gc *GitCommiter) Checkout(options *CheckoutOptions) error {
 	var err error
-	gc.repo, err = gogit.PlainOpen("./")
+	gc.repo, err = git.PlainOpen("./")
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (gc *GitCommiter) Checkout(options *CheckoutOptions) error {
 	log.Println("worktree fetched")
 
 	log.Println("checking out master")
-	err = w.Checkout(&gogit.CheckoutOptions{
+	err = w.Checkout(&git.CheckoutOptions{
 		Create: false,
 		Force:  options.Force,
 		Keep:   options.Keep,
@@ -76,7 +76,7 @@ func (gc *GitCommiter) Commit(message string, files ...string) (plumbing.Hash, e
 	log.Println("changes added")
 
 	log.Println("performing commit")
-	commitHash, err := gc.w.Commit(message, &gogit.CommitOptions{
+	commitHash, err := gc.w.Commit(message, &git.CommitOptions{
 		Author: &object.Signature{
 			Name:  "Mister CI tool",
 			Email: "dev@mysterium.network",
@@ -110,7 +110,7 @@ func (gc *GitCommiter) Push(options *PushOptions) error {
 	log.Println("Pushing...")
 	rs := config.RefSpec("refs/tags/*:refs/tags/*")
 	rsm := config.RefSpec(fmt.Sprintf("refs/heads/%v:refs/heads/%v", gc.branch, gc.branch))
-	err := gc.repo.Push(&gogit.PushOptions{
+	err := gc.repo.Push(&git.PushOptions{
 		RemoteName: options.Remote,
 		Auth: &http.BasicAuth{
 			// this can be anything but not an empty string

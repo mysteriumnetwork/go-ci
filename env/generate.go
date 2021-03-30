@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
+	git "github.com/go-git/go-git/v5"
 	"github.com/mysteriumnetwork/go-ci/github"
 	"github.com/pkg/errors"
-	"gopkg.in/src-d/go-git.v4"
 )
 
 type EnvVar struct {

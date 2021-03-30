@@ -18,7 +18,7 @@ import (
 	"github.com/mysteriumnetwork/go-ci/util"
 )
 
-// Fetches the goimports binary
+// GetImports installs goimports binary.
 func GetImports() error {
 	path, _ := util.GetGoBinaryPath("goimports")
 	if path != "" {
@@ -33,7 +33,7 @@ func GetImports() error {
 	return nil
 }
 
-// GoImports checks for issues with go imports
+// GoImports checks for issues with go imports.
 func GoImports(pathToCheck string, excludes ...string) error {
 	mg.Deps(GetImports)
 

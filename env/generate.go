@@ -17,6 +17,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// EnvVar represents an environment variable's value.
 type EnvVar struct {
 	Key BuildVar
 	Val string

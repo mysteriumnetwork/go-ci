@@ -16,6 +16,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
+// GitCommiter provides git functions for CI.
 type GitCommiter struct {
 	repo   *git.Repository
 	w      *git.Worktree
@@ -23,18 +24,21 @@ type GitCommiter struct {
 	token  string
 }
 
+// NewCommiter constructs a new GitCommitter.
 func NewCommiter(apiToken string) *GitCommiter {
 	return &GitCommiter{
 		token: apiToken,
 	}
 }
 
+// CheckoutOptions are options for the Checkout.
 type CheckoutOptions struct {
 	BranchName string
 	Force      bool
 	Keep       bool
 }
 
+// Checkout checks out a branch.
 func (gc *GitCommiter) Checkout(options *CheckoutOptions) error {
 	var err error
 	gc.repo, err = git.PlainOpen("./")
@@ -63,6 +67,7 @@ func (gc *GitCommiter) Checkout(options *CheckoutOptions) error {
 	return nil
 }
 
+// Commit stages and commits the changes in the working tree.
 func (gc *GitCommiter) Commit(message string, files ...string) (plumbing.Hash, error) {
 	log.Println("adding changes")
 	for _, file := range files {
@@ -90,6 +95,7 @@ func (gc *GitCommiter) Commit(message string, files ...string) (plumbing.Hash, e
 	return commitHash, nil
 }
 
+// Tag creates a tag.
 func (gc *GitCommiter) Tag(tagVersion string, hash plumbing.Hash) error {
 	log.Println("Tagging...", tagVersion)
 	n := plumbing.ReferenceName("refs/tags/" + tagVersion)
@@ -102,10 +108,12 @@ func (gc *GitCommiter) Tag(tagVersion string, hash plumbing.Hash) error {
 	return nil
 }
 
+// PushOptions are options for the Push.
 type PushOptions struct {
 	Remote string
 }
 
+// Push pushes commits to a remote.
 func (gc *GitCommiter) Push(options *PushOptions) error {
 	log.Println("Pushing...")
 	rs := config.RefSpec("refs/tags/*:refs/tags/*")

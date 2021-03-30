@@ -8,7 +8,7 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-// Runs the test suite against the repo
+// Test runs the tests.
 func Test(path string) error {
 	return sh.RunV("go", "test", "-race", "-cover", path)
 }

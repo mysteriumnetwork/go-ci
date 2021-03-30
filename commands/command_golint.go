@@ -16,7 +16,7 @@ import (
 	"github.com/mysteriumnetwork/go-ci/util"
 )
 
-// Checks if golint exists, if not installs it
+// GetLint installs golint binary.
 func GetLint() error {
 	path, _ := util.GetGoBinaryPath("golint")
 	if path != "" {

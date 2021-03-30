@@ -52,21 +52,24 @@ func getFilesWithoutCopyright(dirsToCheck []string) ([]string, error) {
 func Copyright(path string, excludes ...string) error {
 	res, err := util.GetPackagePathsWithExcludes(path, excludes...)
 	if err != nil {
+		fmt.Println("❌ Copyright")
 		fmt.Println("go list crashed")
 		return err
 	}
 	badFiles, err := getFilesWithoutCopyright(res)
 	if err != nil {
+		fmt.Println("❌ Copyright")
 		return err
 	}
 	if len(badFiles) != 0 {
+		fmt.Println("❌ Copyright")
 		fmt.Println("Following files are missing copyright headers:")
 		for _, v := range badFiles {
 			fmt.Println(v)
 		}
 		return errors.New("Missing copyright headers")
 	}
-	fmt.Println("All files have required copyright headers!")
+	fmt.Println("✅ Copyright")
 	return nil
 }
 
@@ -82,22 +85,25 @@ func CopyrightD(path string, excludes ...string) error {
 	allExcludes = append(allExcludes, util.GoLintExcludes()...)
 	res, err := util.GetProjectFileDirectories(allExcludes)
 	if err != nil {
+		fmt.Println("❌ Copyright")
 		fmt.Println("copyright: go list crashed")
 		return err
 	}
 	badFiles, err := getFilesWithoutCopyrightD(res)
 	if err != nil {
+		fmt.Println("❌ Copyright")
 		fmt.Println("copyright: error listing files")
 		return err
 	}
 	if len(badFiles) != 0 {
+		fmt.Println("❌ Copyright")
 		fmt.Println("copyright: following files are missing copyright headers:")
 		for _, v := range badFiles {
 			fmt.Println(v)
 		}
 		return errors.New("copyright: missing copyright headers")
 	}
-	fmt.Println("copyright: all files have required copyright headers!")
+	fmt.Println("✅ Copyright")
 	return nil
 }
 

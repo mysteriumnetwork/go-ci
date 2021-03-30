@@ -39,12 +39,14 @@ func GoImports(pathToCheck string, excludes ...string) error {
 
 	goimportsBinaryPath, err := util.GetGoBinaryPath("goimports")
 	if err != nil {
+		fmt.Println("❌ GoImports")
 		fmt.Println("Tool 'goimports' not found")
 		return err
 	}
 	gopath := util.GetGoPath()
 	dirs, err := util.GetPackagePathsWithExcludes(pathToCheck, excludes...)
 	if err != nil {
+		fmt.Println("❌ GoImports")
 		fmt.Println("go list crashed")
 		return err
 	}
@@ -70,6 +72,7 @@ func GoImports(pathToCheck string, excludes ...string) error {
 	args = append(args, dirsToLook...)
 	out, err := sh.Output(goimportsBinaryPath, args...)
 	if err != nil {
+		fmt.Println("❌ GoImports")
 		fmt.Println("Could not run goimports")
 		return err
 	}
@@ -78,7 +81,7 @@ func GoImports(pathToCheck string, excludes ...string) error {
 		fmt.Println(out)
 		return errors.New("not all imports follow the goimports format")
 	}
-	fmt.Println("Goimports is happy - all files are OK!")
+	fmt.Println("✅ GoImports")
 	return nil
 }
 
@@ -92,6 +95,7 @@ func GoImportsD(dir string, excludes ...string) error {
 	mg.Deps(GetImports)
 	goimportsBin, err := util.GetGoBinaryPath("goimports")
 	if err != nil {
+		fmt.Println("❌ GoImports")
 		fmt.Println("Tool 'goimports' not found")
 		return err
 	}
@@ -104,14 +108,16 @@ func GoImportsD(dir string, excludes ...string) error {
 	}
 	out, err := shell.NewCmd(goimportsBin + " -e -l -d " + strings.Join(dirs, " ")).Output()
 	if err != nil {
+		fmt.Println("❌ GoImports")
 		fmt.Println("goimports: error executing")
 		return err
 	}
 	if len(out) != 0 {
+		fmt.Println("❌ GoImports")
 		fmt.Println("goimports: the following files contain go import errors:")
 		fmt.Println(out)
 		return errors.New("goimports: not all imports follow the goimports format")
 	}
-	fmt.Println("goimports: all files are OK!")
+	fmt.Println("✅ GoImports")
 	return nil
 }

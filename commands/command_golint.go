@@ -71,12 +71,14 @@ func GoLint(pathToCheck string, excludes ...string) error {
 	mg.Deps(GetLint)
 	golintPath, err := util.GetGoBinaryPath("golint")
 	if err != nil {
+		fmt.Println("❌ GoLint")
 		return err
 	}
 
 	gopath := util.GetGoPath()
 	dirs, err := util.GetPackagePathsWithExcludes(pathToCheck, excludes...)
 	if err != nil {
+		fmt.Println("❌ GoLint")
 		fmt.Println("go list crashed")
 		return err
 	}
@@ -93,12 +95,12 @@ func GoLint(pathToCheck string, excludes ...string) error {
 	output, err := sh.Output(golintPath, args...)
 	exitStatus := sh.ExitStatus(err)
 	if exitStatus == 0 {
-		fmt.Println("No linting errors")
+		fmt.Println("✅ GoLint")
 		return nil
 	}
 
 	formatAndPrintGoLintOutput(output)
-	fmt.Println("Linting failed!")
+	fmt.Println("❌ GoLint")
 	return err
 }
 
@@ -112,6 +114,7 @@ func GoLintD(dir string, excludes ...string) error {
 	mg.Deps(GetLint)
 	golintBin, err := util.GetGoBinaryPath("golint")
 	if err != nil {
+		fmt.Println("❌ GoLint")
 		return err
 	}
 
@@ -120,6 +123,7 @@ func GoLintD(dir string, excludes ...string) error {
 	allExcludes = append(allExcludes, util.GoLintExcludes()...)
 	dirs, err := util.GetProjectFileDirectories(allExcludes)
 	if err != nil {
+		fmt.Println("❌ GoLint")
 		fmt.Println("golint: go list crashed")
 		return err
 	}
@@ -127,11 +131,12 @@ func GoLintD(dir string, excludes ...string) error {
 	output, err := shell.NewCmd(golintBin + " --set_exit_status --min_confidence=1 " + strings.Join(dirs, " ")).Output()
 	exitStatus := sh.ExitStatus(err)
 	if exitStatus != 0 {
+		fmt.Println("❌ GoLint")
 		formatAndPrintGoLintOutput(output)
 		fmt.Println("golint: linting failed!")
 		return err
 	}
 
-	fmt.Println("golint: no linting errors")
+	fmt.Println("✅ GoLint")
 	return nil
 }

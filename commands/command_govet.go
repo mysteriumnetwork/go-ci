@@ -17,8 +17,9 @@ func GoVet(path string, additionalArgs ...string) error {
 	out, err := sh.Output("go", args...)
 	fmt.Print(out)
 	if err != nil {
+		fmt.Println("❌ GoVet")
 		return err
 	}
-	fmt.Println("govet: all files are compliant")
+	fmt.Println("✅ GoVet")
 	return nil
 }

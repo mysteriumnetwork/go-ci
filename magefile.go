@@ -2,12 +2,13 @@
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
 
-// +build tools
+// +build mage
 
 package main
 
-// Empty file for keeping CI tools in go.mod
+import "github.com/mysteriumnetwork/go-ci/commands"
 
-import (
-	_ "golang.org/x/tools/cmd/goimports"
-)
+// Check runs all of the checks.
+func Check() error {
+	return commands.CheckD(".")
+}

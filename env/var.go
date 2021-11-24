@@ -36,6 +36,9 @@ const (
 	// BuildBranch stores branch name
 	BuildBranch = BuildVar("BUILD_BRANCH")
 
+	// BuildCommit stores git commit short SHA
+	BuildCommit = BuildVar("BUILD_COMMIT")
+
 	// BuildBranchSafe stores branch name, with special characters replaced with hyphens
 	BuildBranchSafe = BuildVar("BUILD_BRANCH_SAFE")
 

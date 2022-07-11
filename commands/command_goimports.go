@@ -26,7 +26,7 @@ func GetImports() error {
 		fmt.Println("Tool 'goimports' already installed")
 		return nil
 	}
-	err := sh.RunV("go", "install", "golang.org/x/tools/cmd/goimports")
+	err := sh.RunV("go", "install", "golang.org/x/tools/cmd/goimports@latest")
 	if err != nil {
 		fmt.Println("Could not go get goimports")
 		return err

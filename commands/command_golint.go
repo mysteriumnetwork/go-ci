@@ -23,7 +23,7 @@ func GetLint() error {
 		fmt.Println("Tool 'golint' already installed")
 		return nil
 	}
-	err := sh.RunV("go", "install", "golang.org/x/lint/golint")
+	err := sh.RunV("go", "install", "golang.org/x/lint/golint@latest")
 	if err != nil {
 		fmt.Println("Could not go get golint")
 		return err

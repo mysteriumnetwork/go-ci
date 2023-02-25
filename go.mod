@@ -10,7 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	golang.org/x/net v0.0.0-20210330075724-22f4162a9025 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/sys v0.0.0-20210326220804-49726bf1d181 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/tools v0.1.0
 	google.golang.org/appengine v1.6.1 // indirect
 )
